@@ -1,141 +1,107 @@
+import * as cheerio from 'cheerio';
 import { fetchText } from '../lib/fetch.mjs';
 
-// Mizuho の CSV エンドポイント (試行順)
-// CSV は Shift_JIS でエンコードされている
-const CSV_URLS = {
-  loto6: [
-    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto6/csv/loto6.csv',
-    'https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/loto6/csv/loto6.csv',
-  ],
-  loto7: [
-    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto7/csv/loto7.csv',
-    'https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/loto7/csv/loto7.csv',
-  ],
-  numbers3: [
-    'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers3/csv/numbers3.csv',
-    'https://www.mizuhobank.co.jp/retail/takarakuji/check/numbers/numbers3/csv/numbers3.csv',
-  ],
-  numbers4: [
-    'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers4/csv/numbers4.csv',
-    'https://www.mizuhobank.co.jp/retail/takarakuji/check/numbers/numbers4/csv/numbers4.csv',
-  ],
+const HTML_URLS = {
+  loto6:    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto6/index.html',
+  loto7:    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto7/index.html',
+  numbers3: 'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers3/index.html',
+  numbers4: 'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers4/index.html',
 };
 
-async function tryFetchCsv(urls) {
-  let lastErr;
-  for (const url of urls) {
-    try {
-      console.log(`  trying ${url}`);
-      const text = await fetchText(url, { encoding: 'Shift_JIS' });
-      console.log(`  ✓ got ${text.length} chars`);
-      return { url, text };
-    } catch (e) {
-      console.log(`  ✗ ${e.message}`);
-      lastErr = e;
-    }
-  }
-  throw lastErr ?? new Error('All CSV URLs failed');
+// 令和年 → 西暦年
+function reiwaToAd(reiwaYear) {
+  return 2018 + reiwaYear;
 }
 
-// "2025/12/18" or "2025年12月18日" or "20251218" → ISO "2025-12-18"
-function normalizeDate(raw) {
-  if (!raw) return '';
-  const s = String(raw).trim();
-  let m;
-  if ((m = s.match(/^(\d{4})[\/\-年](\d{1,2})[\/\-月](\d{1,2})/))) {
-    return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+function parseJapaneseDate(text) {
+  if (!text) return '';
+  let m = text.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+  m = text.match(/令和\s*(\d+)\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  if (m) {
+    const ad = reiwaToAd(parseInt(m[1], 10));
+    return `${ad}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
   }
-  if ((m = s.match(/^(\d{4})(\d{2})(\d{2})$/))) {
-    return `${m[1]}-${m[2]}-${m[3]}`;
-  }
-  return s;
+  return '';
 }
 
-// CSV 1 行を { round, draw_date, numbers, bonus } に
-function parseLotoRow(cols, isLoto7) {
-  const round = parseInt(String(cols[0]).replace(/[^\d]/g, ''), 10);
-  if (!Number.isFinite(round)) return null;
-  const draw_date = normalizeDate(cols[1]);
-
-  const pickCount = isLoto7 ? 7 : 6;
-  const numbers = [];
-  for (let i = 0; i < pickCount; i++) {
-    const n = parseInt(String(cols[2 + i]).replace(/[^\d]/g, ''), 10);
-    if (!Number.isFinite(n)) return null;
-    numbers.push(n);
-  }
-
-  let bonus;
-  if (isLoto7) {
-    // LOTO 7: 2つのボーナス数字
-    const b1 = parseInt(String(cols[2 + pickCount]).replace(/[^\d]/g, ''), 10);
-    const b2 = parseInt(String(cols[3 + pickCount]).replace(/[^\d]/g, ''), 10);
-    bonus = [b1, b2].filter(Number.isFinite);
-  } else {
-    const b = parseInt(String(cols[2 + pickCount]).replace(/[^\d]/g, ''), 10);
-    bonus = Number.isFinite(b) ? b : 0;
-  }
-
-  return { round, draw_date, numbers, bonus };
+async function fetchHtml(gameType) {
+  const url = HTML_URLS[gameType];
+  console.log(`  fetching ${url}`);
+  // ScraperAPI は基本 UTF-8 にデコードして返す
+  const html = await fetchText(url, { encoding: 'utf-8' });
+  console.log(`  ✓ got ${html.length} chars`);
+  return { url, html };
 }
 
-function parseNumbersRow(cols, digits) {
-  const round = parseInt(String(cols[0]).replace(/[^\d]/g, ''), 10);
-  if (!Number.isFinite(round)) return null;
-  const draw_date = normalizeDate(cols[1]);
+function dumpStructure($) {
+  // ページタイトル
+  const title = $('title').text().trim();
+  console.log(`  <title>: ${title}`);
 
-  const raw = String(cols[2] ?? '').trim().replace(/[^\d]/g, '');
-  if (raw.length !== digits) return null;
-  return { round, draw_date, numbers: raw };
+  // 数字を含む可能性のある要素を class 名でざっくり調査
+  const candidates = $('table, ul, dl, div').filter((_, el) => {
+    const cls = $(el).attr('class') || '';
+    return /num|loto|kuji|result|win/i.test(cls);
+  });
+  console.log(`  candidate elements: ${candidates.length}`);
+  candidates.slice(0, 6).each((i, el) => {
+    const tag = el.tagName;
+    const cls = $(el).attr('class') || '';
+    const txt = $(el).text().trim().replace(/\s+/g, ' ').substring(0, 120);
+    console.log(`    [${i}] <${tag} class="${cls}">: ${txt}`);
+  });
+
+  // テーブル全部
+  console.log(`  all tables: ${$('table').length}`);
+  $('table').each((i, t) => {
+    if (i >= 4) return;
+    const cls = $(t).attr('class') || '';
+    const txt = $(t).text().trim().replace(/\s+/g, ' ').substring(0, 140);
+    console.log(`    table[${i}] class="${cls}": ${txt}`);
+  });
 }
 
-function parseCsv(text) {
-  const rows = [];
-  // 改行とカンマだけの素朴な CSV パーサで十分 (Mizuho の CSV は引用符なし)
-  for (const line of text.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    const cols = trimmed.split(',').map((c) => c.trim());
-    rows.push(cols);
-  }
-  return rows;
+async function scrapeLotoHtml(gameType) {
+  const { html } = await fetchHtml(gameType);
+  const $ = cheerio.load(html);
+  const bodyText = $('body').text();
+
+  const roundMatch = bodyText.match(/第\s*([\d,]+)\s*回/);
+  const dateMatch = bodyText.match(/(令和\s*\d+|\d{4})\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日/);
+
+  const round = roundMatch ? parseInt(roundMatch[1].replace(/,/g, ''), 10) : null;
+  const draw_date = dateMatch ? parseJapaneseDate(dateMatch[0]) : '';
+  console.log(`  round: ${round}, date: ${draw_date}`);
+
+  dumpStructure($);
+
+  // ─── ここから先は HTML 構造を確認後に実装 ───
+  // 今回は構造ダンプのみで終了
+  return [];
 }
 
-// LOTO 6 / LOTO 7 を取得
+async function scrapeNumbersHtml(gameType) {
+  const { html } = await fetchHtml(gameType);
+  const $ = cheerio.load(html);
+  const bodyText = $('body').text();
+
+  const roundMatch = bodyText.match(/第\s*([\d,]+)\s*回/);
+  const dateMatch = bodyText.match(/(令和\s*\d+|\d{4})\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日/);
+
+  const round = roundMatch ? parseInt(roundMatch[1].replace(/,/g, ''), 10) : null;
+  const draw_date = dateMatch ? parseJapaneseDate(dateMatch[0]) : '';
+  console.log(`  round: ${round}, date: ${draw_date}`);
+
+  dumpStructure($);
+
+  return [];
+}
+
 export async function scrapeLoto(gameType) {
-  const isLoto7 = gameType === 'loto7';
-  const { url, text } = await tryFetchCsv(CSV_URLS[gameType]);
-  const rows = parseCsv(text);
-  console.log(`  parsed ${rows.length} CSV rows from ${url}`);
-
-  // デバッグ: 実際の CSV 構造を確認
-  console.log('  first 300 chars (raw):', JSON.stringify(text.substring(0, 300)));
-  console.log('  sample rows:');
-  for (let i = 0; i < Math.min(3, rows.length); i++) {
-    console.log(`    [${i}] (${rows[i].length} cols):`, JSON.stringify(rows[i]));
-  }
-
-  const results = [];
-  for (const cols of rows) {
-    const r = parseLotoRow(cols, isLoto7);
-    if (r) results.push(r);
-  }
-  console.log(`  valid rounds: ${results.length}`);
-  return results;
+  return scrapeLotoHtml(gameType);
 }
 
-// NUMBERS 3 / NUMBERS 4 を取得
 export async function scrapeNumbers(gameType) {
-  const digits = gameType === 'numbers4' ? 4 : 3;
-  const { url, text } = await tryFetchCsv(CSV_URLS[gameType]);
-  const rows = parseCsv(text);
-  console.log(`  parsed ${rows.length} CSV rows from ${url}`);
-
-  const results = [];
-  for (const cols of rows) {
-    const r = parseNumbersRow(cols, digits);
-    if (r) results.push(r);
-  }
-  console.log(`  valid rounds: ${results.length}`);
-  return results;
+  return scrapeNumbersHtml(gameType);
 }
