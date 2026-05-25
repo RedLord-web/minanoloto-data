@@ -1,5 +1,5 @@
 {
-  "total": 6986,
+  "total": 6990,
   "data": [
     {
       "round": 1,
@@ -188161,6 +188161,114 @@
         "mini": {
           "count": 530,
           "amount": 5900
+        }
+      }
+    },
+    {
+      "round": 6970,
+      "date": "2026-04-27",
+      "numbers": "425",
+      "prizes": {
+        "straight": {
+          "count": 242,
+          "amount": 60400
+        },
+        "box": {
+          "count": 552,
+          "amount": 10000
+        },
+        "set_straight": {
+          "count": 410,
+          "amount": 35200
+        },
+        "set_box": {
+          "count": 955,
+          "amount": 5000
+        },
+        "mini": {
+          "count": 436,
+          "amount": 6000
+        }
+      }
+    },
+    {
+      "round": 6971,
+      "date": "2026-04-28",
+      "numbers": "837",
+      "prizes": {
+        "straight": {
+          "count": 517,
+          "amount": 48000
+        },
+        "box": {
+          "count": 316,
+          "amount": 8000
+        },
+        "set_straight": {
+          "count": 155,
+          "amount": 28000
+        },
+        "set_box": {
+          "count": 759,
+          "amount": 4000
+        },
+        "mini": {
+          "count": 319,
+          "amount": 4800
+        }
+      }
+    },
+    {
+      "round": 6972,
+      "date": "2026-04-29",
+      "numbers": "818",
+      "prizes": {
+        "straight": {
+          "count": 110,
+          "amount": 81000
+        },
+        "box": {
+          "count": 189,
+          "amount": 27000
+        },
+        "set_straight": {
+          "count": 182,
+          "amount": 54000
+        },
+        "set_box": {
+          "count": 289,
+          "amount": 13500
+        },
+        "mini": {
+          "count": 438,
+          "amount": 8100
+        }
+      }
+    },
+    {
+      "round": 6973,
+      "date": "2026-04-30",
+      "numbers": "035",
+      "prizes": {
+        "straight": {
+          "count": 58,
+          "amount": 118200
+        },
+        "box": {
+          "count": 334,
+          "amount": 19700
+        },
+        "set_straight": {
+          "count": 134,
+          "amount": 68900
+        },
+        "set_box": {
+          "count": 822,
+          "amount": 9800
+        },
+        "mini": {
+          "count": 305,
+          "amount": 11800
         }
       }
     },
