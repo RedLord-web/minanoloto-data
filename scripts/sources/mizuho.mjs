@@ -8,161 +8,163 @@ const HTML_URLS = {
   numbers4: 'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers4/index.html',
 };
 
-// 令和年 → 西暦年
-function reiwaToAd(reiwaYear) {
-  return 2018 + reiwaYear;
-}
-
-function parseJapaneseDate(text) {
-  if (!text) return '';
-  let m = text.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
-  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
-  m = text.match(/令和\s*(\d+)\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
-  if (m) {
-    const ad = reiwaToAd(parseInt(m[1], 10));
-    return `${ad}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
-  }
-  return '';
-}
-
 async function fetchHtml(gameType) {
   const url = HTML_URLS[gameType];
   console.log(`  fetching ${url} (render=true)`);
-  // Mizuho は JavaScript で結果を動的にロードするので render=true 必須
   const html = await fetchText(url, { encoding: 'utf-8', render: true });
   console.log(`  ✓ got ${html.length} chars`);
   return { url, html };
 }
 
-// テーブルの行を取り出すヘルパー
-function tableRows($, tableEl) {
-  const rows = [];
-  $(tableEl).find('tr').each((_, tr) => {
-    const cells = [];
-    $(tr).find('th, td').each((_, c) => {
-      cells.push($(c).text().trim().replace(/\s+/g, ' '));
-    });
-    if (cells.length > 0) rows.push(cells);
-  });
-  return rows;
+// "1,234" → 1234, "5口" → 5 等
+function parseJpNum(s) {
+  if (s == null) return null;
+  const m = String(s).match(/[\d,]+/);
+  return m ? parseInt(m[0].replace(/,/g, ''), 10) : null;
 }
 
-// "01" "1" "1,2" 等から数字配列へ
-function extractDigits(text) {
-  return Array.from(text.matchAll(/\d+/g)).map((m) => parseInt(m[0], 10));
+function parseDate(text) {
+  const m = text.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  if (!m) return '';
+  return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
 }
 
-function dumpStructure($) {
-  // ページタイトル
-  const title = $('title').text().trim();
-  console.log(`  <title>: ${title}`);
+// ─── LOTO 6 / LOTO 7 ────────────────────────────────────────────────────────
+function parseLotoTable(text, isLoto7) {
+  const pickCount = isLoto7 ? 7 : 6;
 
-  // 数字を含む可能性のある要素を class 名でざっくり調査
-  const candidates = $('table, ul, dl, div').filter((_, el) => {
-    const cls = $(el).attr('class') || '';
-    return /num|loto|kuji|result|win/i.test(cls);
-  });
-  console.log(`  candidate elements: ${candidates.length}`);
-  candidates.slice(0, 6).each((i, el) => {
-    const tag = el.tagName;
-    const cls = $(el).attr('class') || '';
-    const txt = $(el).text().trim().replace(/\s+/g, ' ').substring(0, 120);
-    console.log(`    [${i}] <${tag} class="${cls}">: ${txt}`);
-  });
+  const roundMatch = text.match(/第\s*(\d+)\s*回/);
+  if (!roundMatch) return null;
+  const round = parseInt(roundMatch[1], 10);
 
-  // テーブル全部
-  console.log(`  all tables: ${$('table').length}`);
-  $('table').each((i, t) => {
-    if (i >= 4) return;
-    const cls = $(t).attr('class') || '';
-    const txt = $(t).text().trim().replace(/\s+/g, ' ').substring(0, 140);
-    console.log(`    table[${i}] class="${cls}": ${txt}`);
-  });
+  const date = parseDate(text);
+  if (!date) return null;
+
+  // 本数字 ... ボーナス数字 の間にある数字を pickCount 個取り出す
+  const mainMatch = text.match(/本数字\s+([\d\s]+?)\s*ボーナス数字/);
+  if (!mainMatch) return null;
+  const mainDigits = (mainMatch[1].match(/\d+/g) ?? []).map(Number);
+  if (mainDigits.length < pickCount) return null;
+  const numbers = mainDigits.slice(0, pickCount);
+
+  // ボーナス数字 (NN) [(NN)] 1等 ... の間にある () 内の数字
+  const bonusMatch = text.match(/ボーナス数字\s+(.+?)\s*1\s*等/);
+  if (!bonusMatch) return null;
+  const bonusDigits = (bonusMatch[1].match(/\d+/g) ?? []).map(Number);
+  const bonus = isLoto7 ? bonusDigits.slice(0, 2) : (bonusDigits[0] ?? 0);
+
+  // 賞金: 1等 X口 Y,Y,Y円 ... (LOTO 6 は 5 等まで, LOTO 7 は 6 等まで)
+  const rankNames = ['1st', '2nd', '3rd', '4th', '5th', '6th'];
+  const prizes = {};
+  const maxRank = isLoto7 ? 6 : 5;
+  for (let r = 1; r <= maxRank; r++) {
+    const re = new RegExp(`${r}\\s*等[^口]*?([\\d,]+)\\s*口\\s+([\\d,]+)\\s*円`);
+    const m = text.match(re);
+    if (m) {
+      prizes[rankNames[r - 1]] = {
+        count: parseInt(m[1].replace(/,/g, ''), 10),
+        amount: parseInt(m[2].replace(/,/g, ''), 10),
+      };
+    }
+  }
+
+  // キャリーオーバー X,XXX,XXX円
+  const carryMatch = text.match(/キャリーオーバー\s+([\d,]+)\s*円/);
+  const carryover = carryMatch ? parseInt(carryMatch[1].replace(/,/g, ''), 10) : 0;
+
+  return { round, date, numbers, bonus, prizes, carryover };
 }
 
 async function scrapeLotoHtml(gameType) {
   const isLoto7 = gameType === 'loto7';
-  const pickCount = isLoto7 ? 7 : 6;
-
   const { html } = await fetchHtml(gameType);
   const $ = cheerio.load(html);
 
-  // メインテーブル: 回別 | 抽せん日 | 本数字 | ボーナス数字 | 販売実績額 | キャリーオーバー
-  const mainTable = $('table.js-lottery-temp-pc').first();
-  if (mainTable.length === 0) {
-    console.log('  ✗ no main table (js-lottery-temp-pc) found');
-    dumpStructure($);
-    return [];
-  }
-
-  const rows = tableRows($, mainTable);
-  console.log(`  main table rows: ${rows.length}`);
-  for (let i = 0; i < Math.min(4, rows.length); i++) {
-    console.log(`    [${i}] (${rows[i].length}):`, JSON.stringify(rows[i]));
-  }
+  // 全 section__table を走査
+  const tables = $('table.section__table');
+  console.log(`  scanning ${tables.length} tables`);
 
   const results = [];
-  // i=0 は通常ヘッダー
-  for (let i = 1; i < rows.length; i++) {
-    const cells = rows[i];
-    if (cells.length < 4) continue;
+  tables.each((_, t) => {
+    const text = $(t).text().trim().replace(/\s+/g, ' ');
+    const parsed = parseLotoTable(text, isLoto7);
+    if (parsed) results.push(parsed);
+  });
 
-    const round = parseInt(String(cells[0]).replace(/[^\d]/g, ''), 10);
-    if (!Number.isFinite(round)) continue;
+  console.log(`  extracted: ${results.length} rounds`);
+  if (results.length > 0) {
+    const r = results[0];
+    console.log(`  sample: round=${r.round}, date=${r.date}, numbers=${JSON.stringify(r.numbers)}, bonus=${JSON.stringify(r.bonus)}, prizes_keys=${Object.keys(r.prizes).join(',')}, carry=${r.carryover}`);
+  }
+  return results;
+}
 
-    const draw_date = parseJapaneseDate(cells[1]);
+// ─── NUMBERS 3 / NUMBERS 4 ──────────────────────────────────────────────────
+const NUMBERS_PRIZE_LABELS_N3 = {
+  straight:     'ストレート',
+  box:          'ボックス',
+  set_straight: 'セット（ストレート）',
+  set_box:      'セット（ボックス）',
+  mini:         'ミニ',
+};
+const NUMBERS_PRIZE_LABELS_N4 = {
+  straight:     'ストレート',
+  box:          'ボックス',
+  set_straight: 'セット（ストレート）',
+  set_box:      'セット（ボックス）',
+};
 
-    const mainDigits = extractDigits(cells[2]);
-    if (mainDigits.length < pickCount) continue;
-    const numbers = mainDigits.slice(0, pickCount);
+function parseNumbersTable(text, digits) {
+  const roundMatch = text.match(/第\s*(\d+)\s*回/);
+  if (!roundMatch) return null;
+  const round = parseInt(roundMatch[1], 10);
 
-    const bonusDigits = extractDigits(cells[3]);
-    const bonus = isLoto7
-      ? bonusDigits.slice(0, 2)
-      : (Number.isFinite(bonusDigits[0]) ? bonusDigits[0] : 0);
+  const date = parseDate(text);
+  if (!date) return null;
 
-    results.push({ round, draw_date, numbers, bonus });
+  // 抽せん数字 NNN [NNNN] ストレート
+  const numMatch = text.match(/抽せん数字\s+(\d+)/);
+  if (!numMatch) return null;
+  const numStr = numMatch[1];
+  if (numStr.length !== digits) return null;
+
+  const labels = digits === 4 ? NUMBERS_PRIZE_LABELS_N4 : NUMBERS_PRIZE_LABELS_N3;
+  const prizes = {};
+  for (const [key, label] of Object.entries(labels)) {
+    // 「セット（ストレート）」 内の全角括弧は正規表現的に普通の文字
+    const re = new RegExp(`${label}\\s+([\\d,]+)\\s*口\\s+([\\d,]+)\\s*円`);
+    const m = text.match(re);
+    if (m) {
+      prizes[key] = {
+        count: parseInt(m[1].replace(/,/g, ''), 10),
+        amount: parseInt(m[2].replace(/,/g, ''), 10),
+      };
+    }
   }
 
-  console.log(`  valid rounds: ${results.length}`);
-  return results;
+  return { round, date, numbers: numStr, prizes };
 }
 
 async function scrapeNumbersHtml(gameType) {
   const digits = gameType === 'numbers4' ? 4 : 3;
-
   const { html } = await fetchHtml(gameType);
   const $ = cheerio.load(html);
 
-  const mainTable = $('table.js-lottery-temp-pc').first();
-  if (mainTable.length === 0) {
-    console.log('  ✗ no main table (js-lottery-temp-pc) found');
-    dumpStructure($);
-    return [];
-  }
-
-  const rows = tableRows($, mainTable);
-  console.log(`  main table rows: ${rows.length}`);
-  for (let i = 0; i < Math.min(4, rows.length); i++) {
-    console.log(`    [${i}] (${rows[i].length}):`, JSON.stringify(rows[i]));
-  }
+  const tables = $('table.section__table');
+  console.log(`  scanning ${tables.length} tables`);
 
   const results = [];
-  for (let i = 1; i < rows.length; i++) {
-    const cells = rows[i];
-    if (cells.length < 3) continue;
+  tables.each((_, t) => {
+    const text = $(t).text().trim().replace(/\s+/g, ' ');
+    const parsed = parseNumbersTable(text, digits);
+    if (parsed) results.push(parsed);
+  });
 
-    const round = parseInt(String(cells[0]).replace(/[^\d]/g, ''), 10);
-    if (!Number.isFinite(round)) continue;
-
-    const draw_date = parseJapaneseDate(cells[1]);
-    const numText = String(cells[2]).replace(/[^\d]/g, '');
-    if (numText.length !== digits) continue;
-
-    results.push({ round, draw_date, numbers: numText });
+  console.log(`  extracted: ${results.length} rounds`);
+  if (results.length > 0) {
+    const r = results[0];
+    console.log(`  sample: round=${r.round}, date=${r.date}, numbers=${r.numbers}, prizes_keys=${Object.keys(r.prizes).join(',')}`);
   }
-
-  console.log(`  valid rounds: ${results.length}`);
   return results;
 }
 
