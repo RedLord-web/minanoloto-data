@@ -108,6 +108,13 @@ export async function scrapeLoto(gameType) {
   const rows = parseCsv(text);
   console.log(`  parsed ${rows.length} CSV rows from ${url}`);
 
+  // デバッグ: 実際の CSV 構造を確認
+  console.log('  first 300 chars (raw):', JSON.stringify(text.substring(0, 300)));
+  console.log('  sample rows:');
+  for (let i = 0; i < Math.min(3, rows.length); i++) {
+    console.log(`    [${i}] (${rows[i].length} cols):`, JSON.stringify(rows[i]));
+  }
+
   const results = [];
   for (const cols of rows) {
     const r = parseLotoRow(cols, isLoto7);
