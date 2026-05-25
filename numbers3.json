@@ -1,5 +1,5 @@
 {
-  "total": 6969,
+  "total": 6985,
   "data": [
     {
       "round": 1,
@@ -188161,6 +188161,438 @@
         "mini": {
           "count": 530,
           "amount": 5900
+        }
+      }
+    },
+    {
+      "round": 6974,
+      "date": "2026-05-01",
+      "numbers": "706",
+      "prizes": {
+        "straight": {
+          "count": 51,
+          "amount": 127800
+        },
+        "box": {
+          "count": 300,
+          "amount": 21300
+        },
+        "set_straight": {
+          "count": 139,
+          "amount": 74500
+        },
+        "set_box": {
+          "count": 645,
+          "amount": 10600
+        },
+        "mini": {
+          "count": 611,
+          "amount": 12700
+        }
+      }
+    },
+    {
+      "round": 6975,
+      "date": "2026-05-04",
+      "numbers": "791",
+      "prizes": {
+        "straight": {
+          "count": 693,
+          "amount": 46400
+        },
+        "box": {
+          "count": 592,
+          "amount": 7700
+        },
+        "set_straight": {
+          "count": 130,
+          "amount": 27000
+        },
+        "set_box": {
+          "count": 1240,
+          "amount": 3800
+        },
+        "mini": {
+          "count": 428,
+          "amount": 4600
+        }
+      }
+    },
+    {
+      "round": 6976,
+      "date": "2026-05-05",
+      "numbers": "579",
+      "prizes": {
+        "straight": {
+          "count": 49,
+          "amount": 113300
+        },
+        "box": {
+          "count": 278,
+          "amount": 18800
+        },
+        "set_straight": {
+          "count": 161,
+          "amount": 66000
+        },
+        "set_box": {
+          "count": 648,
+          "amount": 9400
+        },
+        "mini": {
+          "count": 375,
+          "amount": 11300
+        }
+      }
+    },
+    {
+      "round": 6977,
+      "date": "2026-05-06",
+      "numbers": "369",
+      "prizes": {
+        "straight": {
+          "count": 670,
+          "amount": 31000
+        },
+        "box": {
+          "count": 525,
+          "amount": 5100
+        },
+        "set_straight": {
+          "count": 486,
+          "amount": 18000
+        },
+        "set_box": {
+          "count": 1037,
+          "amount": 2500
+        },
+        "mini": {
+          "count": 392,
+          "amount": 3100
+        }
+      }
+    },
+    {
+      "round": 6978,
+      "date": "2026-05-07",
+      "numbers": "256",
+      "prizes": {
+        "straight": {
+          "count": 67,
+          "amount": 82700
+        },
+        "box": {
+          "count": 444,
+          "amount": 13700
+        },
+        "set_straight": {
+          "count": 246,
+          "amount": 48200
+        },
+        "set_box": {
+          "count": 1016,
+          "amount": 6800
+        },
+        "mini": {
+          "count": 563,
+          "amount": 8200
+        }
+      }
+    },
+    {
+      "round": 6979,
+      "date": "2026-05-08",
+      "numbers": "647",
+      "prizes": {
+        "straight": {
+          "count": 56,
+          "amount": 108000
+        },
+        "box": {
+          "count": 357,
+          "amount": 18000
+        },
+        "set_straight": {
+          "count": 217,
+          "amount": 63000
+        },
+        "set_box": {
+          "count": 748,
+          "amount": 9000
+        },
+        "mini": {
+          "count": 400,
+          "amount": 10800
+        }
+      }
+    },
+    {
+      "round": 6980,
+      "date": "2026-05-11",
+      "numbers": "971",
+      "prizes": {
+        "straight": {
+          "count": 51,
+          "amount": 108600
+        },
+        "box": {
+          "count": 533,
+          "amount": 18100
+        },
+        "set_straight": {
+          "count": 151,
+          "amount": 63300
+        },
+        "set_box": {
+          "count": 1109,
+          "amount": 9000
+        },
+        "mini": {
+          "count": 413,
+          "amount": 10800
+        }
+      }
+    },
+    {
+      "round": 6981,
+      "date": "2026-05-12",
+      "numbers": "760",
+      "prizes": {
+        "straight": {
+          "count": 55,
+          "amount": 122800
+        },
+        "box": {
+          "count": 297,
+          "amount": 20400
+        },
+        "set_straight": {
+          "count": 120,
+          "amount": 71600
+        },
+        "set_box": {
+          "count": 686,
+          "amount": 10200
+        },
+        "mini": {
+          "count": 302,
+          "amount": 12200
+        }
+      }
+    },
+    {
+      "round": 6982,
+      "date": "2026-05-13",
+      "numbers": "848",
+      "prizes": {
+        "straight": {
+          "count": 56,
+          "amount": 121500
+        },
+        "box": {
+          "count": 167,
+          "amount": 40500
+        },
+        "set_straight": {
+          "count": 123,
+          "amount": 81000
+        },
+        "set_box": {
+          "count": 248,
+          "amount": 20200
+        },
+        "mini": {
+          "count": 426,
+          "amount": 12100
+        }
+      }
+    },
+    {
+      "round": 6983,
+      "date": "2026-05-14",
+      "numbers": "674",
+      "prizes": {
+        "straight": {
+          "count": 142,
+          "amount": 78300
+        },
+        "box": {
+          "count": 355,
+          "amount": 13000
+        },
+        "set_straight": {
+          "count": 195,
+          "amount": 45600
+        },
+        "set_box": {
+          "count": 766,
+          "amount": 6500
+        },
+        "mini": {
+          "count": 372,
+          "amount": 7800
+        }
+      }
+    },
+    {
+      "round": 6984,
+      "date": "2026-05-15",
+      "numbers": "685",
+      "prizes": {
+        "straight": {
+          "count": 374,
+          "amount": 58600
+        },
+        "box": {
+          "count": 419,
+          "amount": 9700
+        },
+        "set_straight": {
+          "count": 160,
+          "amount": 34100
+        },
+        "set_box": {
+          "count": 941,
+          "amount": 4800
+        },
+        "mini": {
+          "count": 507,
+          "amount": 5800
+        }
+      }
+    },
+    {
+      "round": 6985,
+      "date": "2026-05-18",
+      "numbers": "621",
+      "prizes": {
+        "straight": {
+          "count": 158,
+          "amount": 74400
+        },
+        "box": {
+          "count": 620,
+          "amount": 12400
+        },
+        "set_straight": {
+          "count": 240,
+          "amount": 43400
+        },
+        "set_box": {
+          "count": 1155,
+          "amount": 6200
+        },
+        "mini": {
+          "count": 471,
+          "amount": 7400
+        }
+      }
+    },
+    {
+      "round": 6986,
+      "date": "2026-05-19",
+      "numbers": "284",
+      "prizes": {
+        "straight": {
+          "count": 41,
+          "amount": 100800
+        },
+        "box": {
+          "count": 457,
+          "amount": 16800
+        },
+        "set_straight": {
+          "count": 140,
+          "amount": 58800
+        },
+        "set_box": {
+          "count": 1049,
+          "amount": 8400
+        },
+        "mini": {
+          "count": 271,
+          "amount": 10000
+        }
+      }
+    },
+    {
+      "round": 6987,
+      "date": "2026-05-20",
+      "numbers": "762",
+      "prizes": {
+        "straight": {
+          "count": 807,
+          "amount": 36300
+        },
+        "box": {
+          "count": 405,
+          "amount": 6000
+        },
+        "set_straight": {
+          "count": 131,
+          "amount": 21100
+        },
+        "set_box": {
+          "count": 1029,
+          "amount": 3000
+        },
+        "mini": {
+          "count": 299,
+          "amount": 3600
+        }
+      }
+    },
+    {
+      "round": 6988,
+      "date": "2026-05-21",
+      "numbers": "127",
+      "prizes": {
+        "straight": {
+          "count": 773,
+          "amount": 29100
+        },
+        "box": {
+          "count": 482,
+          "amount": 4800
+        },
+        "set_straight": {
+          "count": 305,
+          "amount": 16900
+        },
+        "set_box": {
+          "count": 1273,
+          "amount": 2400
+        },
+        "mini": {
+          "count": 411,
+          "amount": 2900
+        }
+      }
+    },
+    {
+      "round": 6989,
+      "date": "2026-05-22",
+      "numbers": "253",
+      "prizes": {
+        "straight": {
+          "count": 67,
+          "amount": 95800
+        },
+        "box": {
+          "count": 440,
+          "amount": 15900
+        },
+        "set_straight": {
+          "count": 164,
+          "amount": 55800
+        },
+        "set_box": {
+          "count": 1116,
+          "amount": 7900
+        },
+        "mini": {
+          "count": 454,
+          "amount": 9500
         }
       }
     }
