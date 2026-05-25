@@ -1,19 +1,42 @@
 import * as cheerio from 'cheerio';
 import { fetchText } from '../lib/fetch.mjs';
 
+// メインページは最新 ~6 (LOTO) / ~16 (NUMBERS) 回分しか出ない。
+// シードと現時点の差分が拾えない場合に備えて backnumber も同時に走査する。
 const HTML_URLS = {
-  loto6:    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto6/index.html',
-  loto7:    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto7/index.html',
-  numbers3: 'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers3/index.html',
-  numbers4: 'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers4/index.html',
+  loto6: [
+    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto6/index.html',
+    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/backnumber/loto6.html',
+  ],
+  loto7: [
+    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto7/index.html',
+    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/backnumber/loto7.html',
+  ],
+  numbers3: [
+    'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers3/index.html',
+    'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/backnumber/numbers3.html',
+  ],
+  numbers4: [
+    'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers4/index.html',
+    'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/backnumber/numbers4.html',
+  ],
 };
 
-async function fetchHtml(gameType) {
-  const url = HTML_URLS[gameType];
-  console.log(`  fetching ${url} (render=true)`);
-  const html = await fetchText(url, { encoding: 'utf-8', render: true });
-  console.log(`  ✓ got ${html.length} chars`);
-  return { url, html };
+// 各 URL を順番に取得 (どれかが 404 等で失敗しても他の結果を返す)
+async function fetchHtmlPages(gameType) {
+  const pages = [];
+  for (const url of HTML_URLS[gameType]) {
+    try {
+      console.log(`  fetching ${url} (render=true)`);
+      const html = await fetchText(url, { encoding: 'utf-8', render: true });
+      console.log(`    ✓ got ${html.length} chars`);
+      pages.push({ url, html });
+    } catch (e) {
+      console.log(`    ✗ ${e.message}`);
+    }
+  }
+  if (pages.length === 0) throw new Error('all pages failed');
+  return pages;
 }
 
 // "1,234" → 1234, "5口" → 5 等
@@ -77,25 +100,27 @@ function parseLotoTable(text, isLoto7) {
 
 async function scrapeLotoHtml(gameType) {
   const isLoto7 = gameType === 'loto7';
-  const { html } = await fetchHtml(gameType);
-  const $ = cheerio.load(html);
+  const pages = await fetchHtmlPages(gameType);
 
-  // 全 section__table を走査
-  const tables = $('table.section__table');
-  console.log(`  scanning ${tables.length} tables`);
-
+  const seen = new Set();
   const results = [];
-  tables.each((_, t) => {
-    const text = $(t).text().trim().replace(/\s+/g, ' ');
-    const parsed = parseLotoTable(text, isLoto7);
-    if (parsed) results.push(parsed);
-  });
-
-  console.log(`  extracted: ${results.length} rounds`);
-  if (results.length > 0) {
-    const r = results[0];
-    console.log(`  sample: round=${r.round}, date=${r.date}, numbers=${JSON.stringify(r.numbers)}, bonus=${JSON.stringify(r.bonus)}, prizes_keys=${Object.keys(r.prizes).join(',')}, carry=${r.carryover}`);
+  for (const { url, html } of pages) {
+    const $ = cheerio.load(html);
+    const tables = $('table.section__table');
+    let pageCount = 0;
+    tables.each((_, t) => {
+      const text = $(t).text().trim().replace(/\s+/g, ' ');
+      const parsed = parseLotoTable(text, isLoto7);
+      if (parsed && !seen.has(parsed.round)) {
+        seen.add(parsed.round);
+        results.push(parsed);
+        pageCount++;
+      }
+    });
+    console.log(`    ${url.split('/').slice(-2).join('/')}: ${tables.length} tables → ${pageCount} new rounds`);
   }
+
+  console.log(`  total extracted: ${results.length} rounds (rounds: ${[...seen].sort((a, b) => a - b).slice(0, 4).join(',')}...${[...seen].sort((a, b) => b - a)[0]})`);
   return results;
 }
 
@@ -147,24 +172,27 @@ function parseNumbersTable(text, digits) {
 
 async function scrapeNumbersHtml(gameType) {
   const digits = gameType === 'numbers4' ? 4 : 3;
-  const { html } = await fetchHtml(gameType);
-  const $ = cheerio.load(html);
+  const pages = await fetchHtmlPages(gameType);
 
-  const tables = $('table.section__table');
-  console.log(`  scanning ${tables.length} tables`);
-
+  const seen = new Set();
   const results = [];
-  tables.each((_, t) => {
-    const text = $(t).text().trim().replace(/\s+/g, ' ');
-    const parsed = parseNumbersTable(text, digits);
-    if (parsed) results.push(parsed);
-  });
-
-  console.log(`  extracted: ${results.length} rounds`);
-  if (results.length > 0) {
-    const r = results[0];
-    console.log(`  sample: round=${r.round}, date=${r.date}, numbers=${r.numbers}, prizes_keys=${Object.keys(r.prizes).join(',')}`);
+  for (const { url, html } of pages) {
+    const $ = cheerio.load(html);
+    const tables = $('table.section__table');
+    let pageCount = 0;
+    tables.each((_, t) => {
+      const text = $(t).text().trim().replace(/\s+/g, ' ');
+      const parsed = parseNumbersTable(text, digits);
+      if (parsed && !seen.has(parsed.round)) {
+        seen.add(parsed.round);
+        results.push(parsed);
+        pageCount++;
+      }
+    });
+    console.log(`    ${url.split('/').slice(-2).join('/')}: ${tables.length} tables → ${pageCount} new rounds`);
   }
+
+  console.log(`  total extracted: ${results.length} rounds (rounds: ${[...seen].sort((a, b) => a - b).slice(0, 4).join(',')}...${[...seen].sort((a, b) => b - a)[0]})`);
   return results;
 }
 
