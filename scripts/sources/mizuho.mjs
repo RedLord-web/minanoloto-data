@@ -27,11 +27,29 @@ function parseJapaneseDate(text) {
 
 async function fetchHtml(gameType) {
   const url = HTML_URLS[gameType];
-  console.log(`  fetching ${url}`);
-  // ScraperAPI は基本 UTF-8 にデコードして返す
-  const html = await fetchText(url, { encoding: 'utf-8' });
+  console.log(`  fetching ${url} (render=true)`);
+  // Mizuho は JavaScript で結果を動的にロードするので render=true 必須
+  const html = await fetchText(url, { encoding: 'utf-8', render: true });
   console.log(`  ✓ got ${html.length} chars`);
   return { url, html };
+}
+
+// テーブルの行を取り出すヘルパー
+function tableRows($, tableEl) {
+  const rows = [];
+  $(tableEl).find('tr').each((_, tr) => {
+    const cells = [];
+    $(tr).find('th, td').each((_, c) => {
+      cells.push($(c).text().trim().replace(/\s+/g, ' '));
+    });
+    if (cells.length > 0) rows.push(cells);
+  });
+  return rows;
+}
+
+// "01" "1" "1,2" 等から数字配列へ
+function extractDigits(text) {
+  return Array.from(text.matchAll(/\d+/g)).map((m) => parseInt(m[0], 10));
 }
 
 function dumpStructure($) {
@@ -63,39 +81,89 @@ function dumpStructure($) {
 }
 
 async function scrapeLotoHtml(gameType) {
+  const isLoto7 = gameType === 'loto7';
+  const pickCount = isLoto7 ? 7 : 6;
+
   const { html } = await fetchHtml(gameType);
   const $ = cheerio.load(html);
-  const bodyText = $('body').text();
 
-  const roundMatch = bodyText.match(/第\s*([\d,]+)\s*回/);
-  const dateMatch = bodyText.match(/(令和\s*\d+|\d{4})\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日/);
+  // メインテーブル: 回別 | 抽せん日 | 本数字 | ボーナス数字 | 販売実績額 | キャリーオーバー
+  const mainTable = $('table.js-lottery-temp-pc').first();
+  if (mainTable.length === 0) {
+    console.log('  ✗ no main table (js-lottery-temp-pc) found');
+    dumpStructure($);
+    return [];
+  }
 
-  const round = roundMatch ? parseInt(roundMatch[1].replace(/,/g, ''), 10) : null;
-  const draw_date = dateMatch ? parseJapaneseDate(dateMatch[0]) : '';
-  console.log(`  round: ${round}, date: ${draw_date}`);
+  const rows = tableRows($, mainTable);
+  console.log(`  main table rows: ${rows.length}`);
+  for (let i = 0; i < Math.min(4, rows.length); i++) {
+    console.log(`    [${i}] (${rows[i].length}):`, JSON.stringify(rows[i]));
+  }
 
-  dumpStructure($);
+  const results = [];
+  // i=0 は通常ヘッダー
+  for (let i = 1; i < rows.length; i++) {
+    const cells = rows[i];
+    if (cells.length < 4) continue;
 
-  // ─── ここから先は HTML 構造を確認後に実装 ───
-  // 今回は構造ダンプのみで終了
-  return [];
+    const round = parseInt(String(cells[0]).replace(/[^\d]/g, ''), 10);
+    if (!Number.isFinite(round)) continue;
+
+    const draw_date = parseJapaneseDate(cells[1]);
+
+    const mainDigits = extractDigits(cells[2]);
+    if (mainDigits.length < pickCount) continue;
+    const numbers = mainDigits.slice(0, pickCount);
+
+    const bonusDigits = extractDigits(cells[3]);
+    const bonus = isLoto7
+      ? bonusDigits.slice(0, 2)
+      : (Number.isFinite(bonusDigits[0]) ? bonusDigits[0] : 0);
+
+    results.push({ round, draw_date, numbers, bonus });
+  }
+
+  console.log(`  valid rounds: ${results.length}`);
+  return results;
 }
 
 async function scrapeNumbersHtml(gameType) {
+  const digits = gameType === 'numbers4' ? 4 : 3;
+
   const { html } = await fetchHtml(gameType);
   const $ = cheerio.load(html);
-  const bodyText = $('body').text();
 
-  const roundMatch = bodyText.match(/第\s*([\d,]+)\s*回/);
-  const dateMatch = bodyText.match(/(令和\s*\d+|\d{4})\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日/);
+  const mainTable = $('table.js-lottery-temp-pc').first();
+  if (mainTable.length === 0) {
+    console.log('  ✗ no main table (js-lottery-temp-pc) found');
+    dumpStructure($);
+    return [];
+  }
 
-  const round = roundMatch ? parseInt(roundMatch[1].replace(/,/g, ''), 10) : null;
-  const draw_date = dateMatch ? parseJapaneseDate(dateMatch[0]) : '';
-  console.log(`  round: ${round}, date: ${draw_date}`);
+  const rows = tableRows($, mainTable);
+  console.log(`  main table rows: ${rows.length}`);
+  for (let i = 0; i < Math.min(4, rows.length); i++) {
+    console.log(`    [${i}] (${rows[i].length}):`, JSON.stringify(rows[i]));
+  }
 
-  dumpStructure($);
+  const results = [];
+  for (let i = 1; i < rows.length; i++) {
+    const cells = rows[i];
+    if (cells.length < 3) continue;
 
-  return [];
+    const round = parseInt(String(cells[0]).replace(/[^\d]/g, ''), 10);
+    if (!Number.isFinite(round)) continue;
+
+    const draw_date = parseJapaneseDate(cells[1]);
+    const numText = String(cells[2]).replace(/[^\d]/g, '');
+    if (numText.length !== digits) continue;
+
+    results.push({ round, draw_date, numbers: numText });
+  }
+
+  console.log(`  valid rounds: ${results.length}`);
+  return results;
 }
 
 export async function scrapeLoto(gameType) {

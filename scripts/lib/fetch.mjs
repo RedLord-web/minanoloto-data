@@ -14,19 +14,26 @@ const SCRAPER_API_KEY = process.env.SCRAPER_API_KEY;
 
 // SCRAPER_API_KEY が設定されている場合は ScraperAPI 経由でリクエストを送る
 // (Akamai が直接アクセスをブロックするため)
-function wrapUrl(url) {
+// render: true で JavaScript 実行 (5 credits/req) — Mizuho は動的レンダリング必須
+function wrapUrl(url, { render = false } = {}) {
   if (!SCRAPER_API_KEY) return url;
   const params = new URLSearchParams({
     api_key: SCRAPER_API_KEY,
     url,
     country_code: 'jp',
   });
+  if (render) params.set('render', 'true');
   return `https://api.scraperapi.com/?${params}`;
 }
 
-export async function fetchText(url, { encoding = 'utf-8' } = {}) {
-  const target = wrapUrl(url);
-  const res = await fetch(target, { headers: COMMON_HEADERS, redirect: 'follow' });
+export async function fetchText(url, { encoding = 'utf-8', render = false } = {}) {
+  const target = wrapUrl(url, { render });
+  // render 経由は内部でヘッドレスブラウザを起動するので timeout を伸ばす
+  const res = await fetch(target, {
+    headers: COMMON_HEADERS,
+    redirect: 'follow',
+    signal: render ? AbortSignal.timeout(90_000) : AbortSignal.timeout(30_000),
+  });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
   }
