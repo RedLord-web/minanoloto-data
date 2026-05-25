@@ -1,5 +1,5 @@
 {
-  "total": 2103,
+  "total": 2105,
   "data": [
     {
       "round": 1,
@@ -75456,6 +75456,78 @@
         }
       },
       "carryover": 493922051
+    },
+    {
+      "round": 2097,
+      "date": "2026-04-27",
+      "numbers": [
+        3,
+        20,
+        24,
+        27,
+        34,
+        42
+      ],
+      "bonus": 37,
+      "prizes": {
+        "1st": {
+          "count": 4,
+          "amount": 21894400
+        },
+        "2nd": {
+          "count": 4,
+          "amount": 21894400
+        },
+        "3rd": {
+          "count": 261,
+          "amount": 362300
+        },
+        "4th": {
+          "count": 12217,
+          "amount": 8100
+        },
+        "5th": {
+          "count": 202554,
+          "amount": 1000
+        }
+      },
+      "carryover": 785838686
+    },
+    {
+      "round": 2098,
+      "date": "2026-04-30",
+      "numbers": [
+        1,
+        6,
+        15,
+        18,
+        19,
+        42
+      ],
+      "bonus": 24,
+      "prizes": {
+        "1st": {
+          "count": 2,
+          "amount": 536215400
+        },
+        "2nd": {
+          "count": 18,
+          "amount": 4776600
+        },
+        "3rd": {
+          "count": 254,
+          "amount": 365500
+        },
+        "4th": {
+          "count": 14486,
+          "amount": 6700
+        },
+        "5th": {
+          "count": 235925,
+          "amount": 1000
+        }
+      },
+      "carryover": 0
     },
     {
       "round": 2099,

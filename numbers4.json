@@ -1,5 +1,5 @@
 {
-  "total": 6986,
+  "total": 6990,
   "data": [
     {
       "round": 1,
@@ -160285,6 +160285,98 @@
         "set_box": {
           "count": 788,
           "amount": 23900
+        }
+      }
+    },
+    {
+      "round": 6970,
+      "date": "2026-04-27",
+      "numbers": "3003",
+      "prizes": {
+        "straight": {
+          "count": 27,
+          "amount": 880800
+        },
+        "box": {
+          "count": 129,
+          "amount": 146800
+        },
+        "set_straight": {
+          "count": 58,
+          "amount": 513800
+        },
+        "set_box": {
+          "count": 382,
+          "amount": 73400
+        }
+      }
+    },
+    {
+      "round": 6971,
+      "date": "2026-04-28",
+      "numbers": "9678",
+      "prizes": {
+        "straight": {
+          "count": 397,
+          "amount": 195200
+        },
+        "box": {
+          "count": 489,
+          "amount": 8100
+        },
+        "set_straight": {
+          "count": 60,
+          "amount": 101600
+        },
+        "set_box": {
+          "count": 1814,
+          "amount": 4000
+        }
+      }
+    },
+    {
+      "round": 6972,
+      "date": "2026-04-29",
+      "numbers": "0799",
+      "prizes": {
+        "straight": {
+          "count": 10,
+          "amount": 1171600
+        },
+        "box": {
+          "count": 99,
+          "amount": 97600
+        },
+        "set_straight": {
+          "count": 58,
+          "amount": 634600
+        },
+        "set_box": {
+          "count": 464,
+          "amount": 48800
+        }
+      }
+    },
+    {
+      "round": 6973,
+      "date": "2026-04-30",
+      "numbers": "8641",
+      "prizes": {
+        "straight": {
+          "count": 25,
+          "amount": 840500
+        },
+        "box": {
+          "count": 386,
+          "amount": 35000
+        },
+        "set_straight": {
+          "count": 63,
+          "amount": 437700
+        },
+        "set_box": {
+          "count": 1451,
+          "amount": 17500
         }
       }
     },
