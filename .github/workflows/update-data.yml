@@ -12,7 +12,8 @@ permissions:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # render=true × 12 fetches (4 games × 3 URLs) で最大 6-7 分掛かる
+    timeout-minutes: 12
 
     steps:
       - name: Checkout
