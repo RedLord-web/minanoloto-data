@@ -1,20 +1,41 @@
 import * as cheerio from 'cheerio';
 import { fetchText } from '../lib/fetch.mjs';
 
-// メインページは最新 ~6 (LOTO) / ~16 (NUMBERS) 回分しか出ない。
-// backnumber URL は調査中 — 一旦メインのみ。
-// (メインページ内のリンク調査結果に応じて後で URL を追加)
-const HTML_URLS = {
-  loto6:    ['https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto6/index.html'],
-  loto7:    ['https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto7/index.html'],
-  numbers3: ['https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers3/index.html'],
-  numbers4: ['https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers4/index.html'],
+// メインページ (最新 ~6 LOTO / ~16 NUMBERS) と
+// 月別アーカイブ (当月 + 前月) を fetch する。
+// アーカイブ URL 形式: /takarakuji/check/<cat>/<game>/index.html?year=YYYY&month=M
+const MAIN_URLS = {
+  loto6:    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto6/index.html',
+  loto7:    'https://www.mizuhobank.co.jp/retail/takarakuji/loto/loto7/index.html',
+  numbers3: 'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers3/index.html',
+  numbers4: 'https://www.mizuhobank.co.jp/retail/takarakuji/numbers/numbers4/index.html',
 };
+const CATEGORY = {
+  loto6: 'loto', loto7: 'loto', numbers3: 'numbers', numbers4: 'numbers',
+};
+
+function archiveUrl(game, year, month) {
+  const cat = CATEGORY[game];
+  return `https://www.mizuhobank.co.jp/takarakuji/check/${cat}/${game}/index.html?year=${year}&month=${month}`;
+}
+
+function buildUrls(game) {
+  const now = new Date();
+  const cur = { y: now.getUTCFullYear(), m: now.getUTCMonth() + 1 };
+  const prevD = new Date(Date.UTC(cur.y, cur.m - 2, 1));
+  const prev = { y: prevD.getUTCFullYear(), m: prevD.getUTCMonth() + 1 };
+  return [
+    MAIN_URLS[game],
+    archiveUrl(game, cur.y, cur.m),
+    archiveUrl(game, prev.y, prev.m),
+  ];
+}
 
 // 各 URL を順番に取得 (どれかが 404 等で失敗しても他の結果を返す)
 async function fetchHtmlPages(gameType) {
+  const urls = buildUrls(gameType);
   const pages = [];
-  for (const url of HTML_URLS[gameType]) {
+  for (const url of urls) {
     try {
       console.log(`  fetching ${url} (render=true)`);
       const html = await fetchText(url, { encoding: 'utf-8', render: true });
@@ -28,20 +49,6 @@ async function fetchHtmlPages(gameType) {
   return pages;
 }
 
-// メインページから backnumber / アーカイブ系のリンクを抽出 (デバッグ用)
-function findArchiveLinks($) {
-  const links = [];
-  $('a').each((_, a) => {
-    const href = $(a).attr('href');
-    const text = $(a).text().trim().replace(/\s+/g, ' ').substring(0, 30);
-    if (!href) return;
-    const combined = `${href} ${text}`;
-    if (/backnumber|過去|バックナンバー|一覧|当せん番号/i.test(combined)) {
-      links.push({ text, href });
-    }
-  });
-  return links;
-}
 
 // "1,234" → 1234, "5口" → 5 等
 function parseJpNum(s) {
@@ -108,15 +115,8 @@ async function scrapeLotoHtml(gameType) {
 
   const seen = new Set();
   const results = [];
-  for (const [pageIdx, { url, html }] of pages.entries()) {
+  for (const { url, html } of pages) {
     const $ = cheerio.load(html);
-    if (pageIdx === 0) {
-      const archiveLinks = findArchiveLinks($);
-      console.log(`  archive link candidates (${archiveLinks.length}):`);
-      for (const l of archiveLinks.slice(0, 12)) {
-        console.log(`    ${l.href} | ${l.text}`);
-      }
-    }
     const tables = $('table.section__table');
     let pageCount = 0;
     tables.each((_, t) => {
@@ -128,10 +128,12 @@ async function scrapeLotoHtml(gameType) {
         pageCount++;
       }
     });
-    console.log(`    ${url.split('/').slice(-2).join('/')}: ${tables.length} tables → ${pageCount} new rounds`);
+    const label = url.includes('check/') ? url.split('?')[1] : 'main';
+    console.log(`    [${label}]: ${tables.length} tables → ${pageCount} new rounds`);
   }
 
-  console.log(`  total extracted: ${results.length} rounds (rounds: ${[...seen].sort((a, b) => a - b).slice(0, 4).join(',')}...${[...seen].sort((a, b) => b - a)[0]})`);
+  const sorted = [...seen].sort((a, b) => a - b);
+  console.log(`  total extracted: ${results.length} rounds (${sorted[0]}~${sorted[sorted.length - 1]})`);
   return results;
 }
 
@@ -187,15 +189,8 @@ async function scrapeNumbersHtml(gameType) {
 
   const seen = new Set();
   const results = [];
-  for (const [pageIdx, { url, html }] of pages.entries()) {
+  for (const { url, html } of pages) {
     const $ = cheerio.load(html);
-    if (pageIdx === 0) {
-      const archiveLinks = findArchiveLinks($);
-      console.log(`  archive link candidates (${archiveLinks.length}):`);
-      for (const l of archiveLinks.slice(0, 12)) {
-        console.log(`    ${l.href} | ${l.text}`);
-      }
-    }
     const tables = $('table.section__table');
     let pageCount = 0;
     tables.each((_, t) => {
@@ -207,10 +202,12 @@ async function scrapeNumbersHtml(gameType) {
         pageCount++;
       }
     });
-    console.log(`    ${url.split('/').slice(-2).join('/')}: ${tables.length} tables → ${pageCount} new rounds`);
+    const label = url.includes('check/') ? url.split('?')[1] : 'main';
+    console.log(`    [${label}]: ${tables.length} tables → ${pageCount} new rounds`);
   }
 
-  console.log(`  total extracted: ${results.length} rounds (rounds: ${[...seen].sort((a, b) => a - b).slice(0, 4).join(',')}...${[...seen].sort((a, b) => b - a)[0]})`);
+  const sorted = [...seen].sort((a, b) => a - b);
+  console.log(`  total extracted: ${results.length} rounds (${sorted[0]}~${sorted[sorted.length - 1]})`);
   return results;
 }
 
