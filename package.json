@@ -1,0 +1,19 @@
+{
+  "name": "minanoloto-data",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scrape": "node scripts/scrape.mjs",
+    "scrape:loto6": "node scripts/scrape.mjs loto6",
+    "scrape:loto7": "node scripts/scrape.mjs loto7",
+    "scrape:numbers3": "node scripts/scrape.mjs numbers3",
+    "scrape:numbers4": "node scripts/scrape.mjs numbers4",
+    "scrape:dry": "DRY_RUN=1 node scripts/scrape.mjs"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

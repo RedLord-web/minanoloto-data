@@ -1,0 +1,49 @@
+name: Update lottery data
+
+on:
+  schedule:
+    # 毎日 14:00 UTC = 23:00 JST に実行 (各種抽選は 18:45 JST に終わる)
+    - cron: '0 14 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Scrape
+        id: scrape
+        run: node scripts/scrape.mjs
+
+      - name: Show diff
+        if: steps.scrape.outputs.added != '0' && steps.scrape.outputs.added != ''
+        run: git diff --stat
+
+      - name: Commit & push
+        if: steps.scrape.outputs.added != '0' && steps.scrape.outputs.added != ''
+        run: |
+          git config user.name "minanoloto-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add loto6.json loto7.json numbers3.json numbers4.json
+          if git diff --cached --quiet; then
+            echo "No staged changes"
+          else
+            git commit -m "chore: add ${{ steps.scrape.outputs.added }} new round(s) [skip ci]"
+            git push
+          fi
