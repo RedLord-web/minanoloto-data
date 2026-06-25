@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { scrapeLoto, scrapeNumbers } from './sources/mizuho.mjs';
+import { scrapeLoto, scrapeNumbers } from './sources/rakuten.mjs';
 import { mergeRounds } from './lib/merge.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
