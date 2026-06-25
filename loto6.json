@@ -1,5 +1,5 @@
 {
-  "total": 2107,
+  "total": 2113,
   "data": [
     {
       "round": 1,
@@ -75852,6 +75852,222 @@
         }
       },
       "carryover": 33399525
+    },
+    {
+      "round": 2108,
+      "date": "2026-06-04",
+      "numbers": [
+        2,
+        5,
+        10,
+        15,
+        28,
+        43
+      ],
+      "bonus": 27,
+      "prizes": {
+        "1st": {
+          "count": 3,
+          "amount": 83434500
+        },
+        "2nd": {
+          "count": 6,
+          "amount": 10845500
+        },
+        "3rd": {
+          "count": 313,
+          "amount": 224500
+        },
+        "4th": {
+          "count": 13552,
+          "amount": 5400
+        },
+        "5th": {
+          "count": 195451,
+          "amount": 1000
+        }
+      },
+      "carryover": 0
+    },
+    {
+      "round": 2109,
+      "date": "2026-06-08",
+      "numbers": [
+        6,
+        11,
+        19,
+        31,
+        38,
+        41
+      ],
+      "bonus": 3,
+      "prizes": {
+        "1st": {
+          "count": 1,
+          "amount": 200000000
+        },
+        "2nd": {
+          "count": 6,
+          "amount": 10863700
+        },
+        "3rd": {
+          "count": 234,
+          "amount": 300800
+        },
+        "4th": {
+          "count": 10718,
+          "amount": 6900
+        },
+        "5th": {
+          "count": 171685,
+          "amount": 1000
+        }
+      },
+      "carryover": 17268406
+    },
+    {
+      "round": 2110,
+      "date": "2026-06-11",
+      "numbers": [
+        3,
+        9,
+        18,
+        35,
+        36,
+        40
+      ],
+      "bonus": 29,
+      "prizes": {
+        "1st": {
+          "count": 2,
+          "amount": 124941200
+        },
+        "2nd": {
+          "count": 4,
+          "amount": 17446600
+        },
+        "3rd": {
+          "count": 217,
+          "amount": 347300
+        },
+        "4th": {
+          "count": 11138,
+          "amount": 7100
+        },
+        "5th": {
+          "count": 167812,
+          "amount": 1000
+        }
+      },
+      "carryover": 0
+    },
+    {
+      "round": 2111,
+      "date": "2026-06-15",
+      "numbers": [
+        1,
+        5,
+        8,
+        12,
+        37,
+        43
+      ],
+      "bonus": 36,
+      "prizes": {
+        "1st": {
+          "count": 0,
+          "amount": 0
+        },
+        "2nd": {
+          "count": 5,
+          "amount": 12451400
+        },
+        "3rd": {
+          "count": 259,
+          "amount": 259500
+        },
+        "4th": {
+          "count": 13929,
+          "amount": 5100
+        },
+        "5th": {
+          "count": 216748,
+          "amount": 1000
+        }
+      },
+      "carryover": 207517626
+    },
+    {
+      "round": 2112,
+      "date": "2026-06-18",
+      "numbers": [
+        3,
+        7,
+        8,
+        27,
+        31,
+        40
+      ],
+      "bonus": 18,
+      "prizes": {
+        "1st": {
+          "count": 0,
+          "amount": 0
+        },
+        "2nd": {
+          "count": 4,
+          "amount": 18589200
+        },
+        "3rd": {
+          "count": 293,
+          "amount": 274000
+        },
+        "4th": {
+          "count": 14317,
+          "amount": 5900
+        },
+        "5th": {
+          "count": 218891,
+          "amount": 1000
+        }
+      },
+      "carryover": 455366461
+    },
+    {
+      "round": 2113,
+      "date": "2026-06-22",
+      "numbers": [
+        2,
+        5,
+        32,
+        36,
+        38,
+        42
+      ],
+      "bonus": 14,
+      "prizes": {
+        "1st": {
+          "count": 0,
+          "amount": 0
+        },
+        "2nd": {
+          "count": 8,
+          "amount": 10842600
+        },
+        "3rd": {
+          "count": 225,
+          "amount": 416300
+        },
+        "4th": {
+          "count": 12885,
+          "amount": 7600
+        },
+        "5th": {
+          "count": 213988,
+          "amount": 1000
+        }
+      },
+      "carryover": 744495484
     }
   ]
 }

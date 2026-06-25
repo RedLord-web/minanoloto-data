@@ -1,5 +1,5 @@
 {
-  "total": 679,
+  "total": 682,
   "data": [
     {
       "round": 1,
@@ -29876,6 +29876,138 @@
         }
       },
       "carryover": 0
+    },
+    {
+      "round": 680,
+      "date": "2026-06-05",
+      "numbers": [
+        9,
+        10,
+        22,
+        26,
+        27,
+        31,
+        36
+      ],
+      "bonus": [
+        20,
+        29
+      ],
+      "prizes": {
+        "1st": {
+          "count": 0,
+          "amount": 0
+        },
+        "2nd": {
+          "count": 7,
+          "amount": 6861400
+        },
+        "3rd": {
+          "count": 65,
+          "amount": 851100
+        },
+        "4th": {
+          "count": 4347,
+          "amount": 7700
+        },
+        "5th": {
+          "count": 73236,
+          "amount": 1500
+        },
+        "6th": {
+          "count": 121710,
+          "amount": 1100
+        }
+      },
+      "carryover": 403991465
+    },
+    {
+      "round": 681,
+      "date": "2026-06-12",
+      "numbers": [
+        1,
+        10,
+        12,
+        13,
+        19,
+        33,
+        35
+      ],
+      "bonus": [
+        14,
+        37
+      ],
+      "prizes": {
+        "1st": {
+          "count": 1,
+          "amount": 910082500
+        },
+        "2nd": {
+          "count": 6,
+          "amount": 9942700
+        },
+        "3rd": {
+          "count": 94,
+          "amount": 731000
+        },
+        "4th": {
+          "count": 5510,
+          "amount": 7500
+        },
+        "5th": {
+          "count": 94077,
+          "amount": 1400
+        },
+        "6th": {
+          "count": 151785,
+          "amount": 1100
+        }
+      },
+      "carryover": 0
+    },
+    {
+      "round": 682,
+      "date": "2026-06-19",
+      "numbers": [
+        11,
+        14,
+        17,
+        23,
+        28,
+        30,
+        36
+      ],
+      "bonus": [
+        12,
+        20
+      ],
+      "prizes": {
+        "1st": {
+          "count": 0,
+          "amount": 0
+        },
+        "2nd": {
+          "count": 8,
+          "amount": 6025900
+        },
+        "3rd": {
+          "count": 123,
+          "amount": 451400
+        },
+        "4th": {
+          "count": 5736,
+          "amount": 5800
+        },
+        "5th": {
+          "count": 81327,
+          "amount": 1300
+        },
+        "6th": {
+          "count": 125087,
+          "amount": 1100
+        }
+      },
+      "carryover": 407125875
     }
   ]
 }
