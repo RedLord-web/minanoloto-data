@@ -1,5 +1,5 @@
 {
-  "total": 2116,
+  "total": 2117,
   "data": [
     {
       "round": 1,
@@ -76176,6 +76176,42 @@
         }
       },
       "carryover": 0
+    },
+    {
+      "round": 2117,
+      "date": "2026-07-06",
+      "numbers": [
+        4,
+        7,
+        26,
+        27,
+        35,
+        41
+      ],
+      "bonus": 34,
+      "prizes": {
+        "1st": {
+          "count": 0,
+          "amount": 0
+        },
+        "2nd": {
+          "count": 4,
+          "amount": 17279500
+        },
+        "3rd": {
+          "count": 213,
+          "amount": 350400
+        },
+        "4th": {
+          "count": 11374,
+          "amount": 6900
+        },
+        "5th": {
+          "count": 181867,
+          "amount": 1000
+        }
+      },
+      "carryover": 230386799
     }
   ]
 }
