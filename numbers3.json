@@ -1,5 +1,5 @@
 {
-  "total": 7042,
+  "total": 7044,
   "data": [
     {
       "round": 1,
@@ -190132,6 +190132,60 @@
         "mini": {
           "count": 291,
           "amount": 12000
+        }
+      }
+    },
+    {
+      "round": 7043,
+      "date": "2026-08-06",
+      "numbers": "163",
+      "prizes": {
+        "straight": {
+          "count": 78,
+          "amount": 83000
+        },
+        "box": {
+          "count": 424,
+          "amount": 13800
+        },
+        "set_straight": {
+          "count": 207,
+          "amount": 48400
+        },
+        "set_box": {
+          "count": 1038,
+          "amount": 6900
+        },
+        "mini": {
+          "count": 310,
+          "amount": 8300
+        }
+      }
+    },
+    {
+      "round": 7044,
+      "date": "2026-08-07",
+      "numbers": "487",
+      "prizes": {
+        "straight": {
+          "count": 55,
+          "amount": 101700
+        },
+        "box": {
+          "count": 301,
+          "amount": 16900
+        },
+        "set_straight": {
+          "count": 162,
+          "amount": 59300
+        },
+        "set_box": {
+          "count": 751,
+          "amount": 8400
+        },
+        "mini": {
+          "count": 812,
+          "amount": 10100
         }
       }
     }
