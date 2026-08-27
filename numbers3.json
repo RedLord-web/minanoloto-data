@@ -1,5 +1,5 @@
 {
-  "total": 7057,
+  "total": 7058,
   "data": [
     {
       "round": 1,
@@ -190537,6 +190537,33 @@
         "mini": {
           "count": 354,
           "amount": 8100
+        }
+      }
+    },
+    {
+      "round": 7058,
+      "date": "2026-08-27",
+      "numbers": "460",
+      "prizes": {
+        "straight": {
+          "count": 56,
+          "amount": 109400
+        },
+        "box": {
+          "count": 314,
+          "amount": 18200
+        },
+        "set_straight": {
+          "count": 165,
+          "amount": 63800
+        },
+        "set_box": {
+          "count": 703,
+          "amount": 9100
+        },
+        "mini": {
+          "count": 345,
+          "amount": 10900
         }
       }
     }

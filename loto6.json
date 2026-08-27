@@ -1,5 +1,5 @@
 {
-  "total": 2131,
+  "total": 2132,
   "data": [
     {
       "round": 1,
@@ -76716,6 +76716,42 @@
         }
       },
       "carryover": 237030272
+    },
+    {
+      "round": 2132,
+      "date": "2026-08-27",
+      "numbers": [
+        9,
+        15,
+        16,
+        19,
+        31,
+        32
+      ],
+      "bonus": 4,
+      "prizes": {
+        "1st": {
+          "count": 2,
+          "amount": 246410700
+        },
+        "2nd": {
+          "count": 8,
+          "amount": 9592400
+        },
+        "3rd": {
+          "count": 213,
+          "amount": 389000
+        },
+        "4th": {
+          "count": 10351,
+          "amount": 8400
+        },
+        "5th": {
+          "count": 174843,
+          "amount": 1000
+        }
+      },
+      "carryover": 0
     }
   ]
 }
