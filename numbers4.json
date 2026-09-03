@@ -1,5 +1,5 @@
 {
-  "total": 7062,
+  "total": 7063,
   "data": [
     {
       "round": 1,
@@ -162424,6 +162424,29 @@
         "set_box": {
           "count": 677,
           "amount": 50900
+        }
+      }
+    },
+    {
+      "round": 7063,
+      "date": "2026-09-03",
+      "numbers": "3691",
+      "prizes": {
+        "straight": {
+          "count": 47,
+          "amount": 543000
+        },
+        "box": {
+          "count": 446,
+          "amount": 22600
+        },
+        "set_straight": {
+          "count": 112,
+          "amount": 282800
+        },
+        "set_box": {
+          "count": 1621,
+          "amount": 11300
         }
       }
     }
