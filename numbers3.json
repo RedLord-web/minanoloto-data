@@ -1,5 +1,5 @@
 {
-  "total": 7105,
+  "total": 7106,
   "data": [
     {
       "round": 1,
@@ -191833,6 +191833,33 @@
         "mini": {
           "count": 486,
           "amount": 7400
+        }
+      }
+    },
+    {
+      "round": 7106,
+      "date": "2026-11-03",
+      "numbers": "753",
+      "prizes": {
+        "straight": {
+          "count": 635,
+          "amount": 37500
+        },
+        "box": {
+          "count": 449,
+          "amount": 6200
+        },
+        "set_straight": {
+          "count": 220,
+          "amount": 21800
+        },
+        "set_box": {
+          "count": 976,
+          "amount": 3100
+        },
+        "mini": {
+          "count": 301,
+          "amount": 3700
         }
       }
     }
