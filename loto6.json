@@ -1,5 +1,5 @@
 {
-  "total": 2151,
+  "total": 2152,
   "data": [
     {
       "round": 1,
@@ -77432,6 +77432,42 @@
         },
         "5th": {
           "count": 252721,
+          "amount": 1000
+        }
+      },
+      "carryover": 0
+    },
+    {
+      "round": 2152,
+      "date": "2026-11-05",
+      "numbers": [
+        7,
+        8,
+        12,
+        20,
+        28,
+        41
+      ],
+      "bonus": 23,
+      "prizes": {
+        "1st": {
+          "count": 2,
+          "amount": 92228200
+        },
+        "2nd": {
+          "count": 7,
+          "amount": 7905500
+        },
+        "3rd": {
+          "count": 319,
+          "amount": 187300
+        },
+        "4th": {
+          "count": 12628,
+          "amount": 5000
+        },
+        "5th": {
+          "count": 182931,
           "amount": 1000
         }
       },
